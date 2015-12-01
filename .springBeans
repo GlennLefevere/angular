@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.7.1.201510041102-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+		<config>src/main/resources/be/provikmo/config/applicationContext-security.xml</config>
+		<config>src/main/resources/be/provikmo/config/applicationContext-remoting.xml</config>
+		<config>src/main/resources/be/provikmo/config/applicationContext-cache.xml</config>
+	</configs>
+	<autoconfigs>
+		<config>java:be.provikmo.AngularApplication</config>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

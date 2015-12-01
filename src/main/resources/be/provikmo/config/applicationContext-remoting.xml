@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       					   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"
+	default-lazy-init="true">
+
+	<bean abstract="true" id="serviceImporter" name="serviceImporter"
+		class="be.provikmo.commons.remoting.rmi.IKMORmiProxyFactoryBean"
+		lazy-init="true">
+		<property name="lookupStubOnStartup" value="false" />
+		<property name="remoteInvocationFactory" ref="remoteInvocationFactory" />
+		<property name="refreshStubOnConnectFailure" value="true" />
+		<property name="connectionFailureHandler" ref="connectionFailureHandler" />
+	</bean>
+
+	<!-- Provikmo Domain Related Services -->
+	<bean id="remoteAuthenticationManager" parent="serviceImporter">
+		<property name="serviceUrl"
+			value="rmi://${rmi.env.host.infrastructure}:${rmi.env.port.registry}/infrastructure.RemoteAuthenticationManager" />
+		<property name="serviceInterface"
+			value="be.provikmo.core.commons.security.authentication.rcp.RemoteAuthenticationManager" />
+	</bean>
+
+	<bean id="provikmo.ResourceService" parent="serviceImporter">
+		<property name="serviceUrl"
+			value="rmi://${rmi.env.host.provikmo}:${rmi.env.port.registry}/provikmo.ResourceService" />
+		<property name="serviceInterface" value="be.provikmo.commons.resource.ResourceService" />
+	</bean>
+
+	<bean id="provikmo.PartijService" parent="serviceImporter">
+		<property name="serviceUrl"
+			value="rmi://${rmi.env.host.provikmo}:${rmi.env.port.registry}/provikmo.PartijService" />
+		<property name="serviceInterface" value="be.ikmo.core.service.partij.PartijService" />
+	</bean>
+
+	<bean id="remoteInvocationFactory"
+		class="org.springframework.security.remoting.rmi.ContextPropagatingRemoteInvocationFactory" />
+
+	<bean id="connectionFailureHandler"
+		class="be.provikmo.commons.remoting.rmi.failure.BaseConnectionFailureHandler" />
+
+	<!-- KnowledgeCenter -->
+	<bean id="knowledgeCenter"
+		class="be.provikmo.core.common.web.layout.knowledgecenter.DefaultKnowledgeCenter"
+		lazy-init="true">
+		<property name="serviceBroker" ref="serviceBroker" />
+	</bean>
+
+</beans>

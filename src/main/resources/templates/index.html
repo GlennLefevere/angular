@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"  lang="en" ng-app="calendarDemoApp" id="top">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta charset="UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+<meta content="" name="description" />
+<meta content="" name="author" />
+<title>Hello AngularJS</title>
+<link rel="stylesheet" href="style/calendarDemo.css" />
+<link rel="stylesheet" href="style/jquery.qtip.css" />
+
+<link rel="stylesheet" th:href="@{/primefaces-admb/css/theme.css}" />
+<link rel="stylesheet" th:href="@{/webjars/fullcalendar/2.4.0/fullcalendar.css}" />
+<link rel="stylesheet" th:href="@{/webjars/font-awesome/4.5.0/css/font-awesome.css}" />
+
+<link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.6/css/bootstrap.min.css}" />
+
+<link rel="stylesheet"
+	th:href="@{/assets/global/plugins/simple-line-icons/simple-line-icons.css}" />
+<link rel="stylesheet"
+	th:href="@{/assets/global/plugins/bootstrap/css/bootstrap.min.css}"/>
+<link rel="stylesheet"
+	th:href="@{/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css}"/>
+
+<link rel="stylesheet" th:href="@{/admb-layout-components/css/reset.css}" />
+<link rel="stylesheet" th:href="@{/admb-layout-components/css/screen.css}" />
+<link rel="stylesheet" th:href="@{/admb-layout-components/css/grid.css}" />
+
+<link rel="stylesheet" th:href="@{/admb-faces-components/css/admb-components.css}" />
+
+<link rel="stylesheet" th:href="@{/webjars/angular-material/0.11.4/angular-material.min.css}" />
+
+<link rel="stylesheet" th:href="@{/assets/layout/css/layout.css}"/>
+<link rel="stylesheet" th:href="@{/assets/layout/css/theme/provikmo.css}"/>
+
+<script th:src="@{/webjars/jquery/1.11.3/jquery.min.js}"></script>
+<script th:src="@{/webjars/jquery-ui/1.11.3/jquery-ui.min.js}"></script>
+<script th:src="@{/webjars/momentjs/2.10.6/moment.js}"></script>
+
+<script th:src="@{/admb-faces-components/js/utils.js}"></script>
+<script th:src="@{/admb-faces-components/js/jquery.viewport.mini.js}"></script>
+
+<link rel="stylesheet" th:href="@{/primefaces-admb/css/themefixes.css}" />
+<link rel="stylesheet" th:href="@{/admb-layout-components/css/style-admb.css}" />
+
+<script th:src="@{/webjars/angularjs/1.4.7/angular.min.js}"></script>
+<script th:src="@{/webjars/angularjs/1.4.7/angular-animate.min.js}"></script>
+<script th:src="@{/webjars/angularjs/1.4.7/angular-aria.min.js}"></script>
+<script th:src="@{/webjars/angular-material/0.11.4/angular-material.min.js}"></script>
+<script th:src="@{/webjars/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.min.js}"></script>
+<script th:src="@{/webjars/fullcalendar/2.4.0/fullcalendar.min.js}"></script>
+<script th:src="@{/webjars/fullcalendar/2.4.0/gcal.js}"></script>
+
+<!-- oude versie opgelost in 1.0.0 -->
+<!-- <script th:src="@{/webjars/angular-ui-calendar/0.8.1/calendar.js}"></script> -->
+
+
+<script src="js/calendar.js"></script>
+<script src="js/jquery.qtip.js"></script>
+
+<script src="js/datetimepicker.js"></script>
+<script src="js/calendarDemo.js"></script>
+<style type="text/css">
+.holiday {
+	background-color: #F3912C !important;
+}
+
+#external-events {
+	float: left;
+	width: 150px;
+	padding: 0 10px;
+	border: 1px solid #ccc;
+	background: #eee;
+	text-align: left;
+}
+
+#external-events h4 {
+	font-size: 16px;
+	margin-top: 0;
+	padding-top: 1em;
+}
+
+#external-events .fc-event {
+	margin: 10px 0;
+	cursor: pointer;
+}
+
+#external-events p {
+	margin: 1.5em 0;
+	font-size: 11px;
+	color: #666;
+}
+
+#external-events p input {
+	margin: 0;
+	vertical-align: middle;
+}
+
+.smallCalendar {
+	float: left;
+	width: 28%;
+}
+
+.schedule {
+	float: left;
+	width: 72%;
+}
+
+.qtip-admb {
+	background: #deebcb;
+	border: 1px solid #0f554c;
+	border: 1px solid rgba(15, 85, 76, 1);
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-webkit-box-shadow: 0 1px 8px #333;
+	-moz-box-shadow: 0 1px 8px #333;
+	box-shadow: 0 1px 8px #333;
+}
+
+td {
+	padding: 0px !important;
+}
+</style>
+
+<script type="text/javascript">
+	//<![CDATA[
+	jQuery(document).ready(function() {
+		Portal.init();
+
+		errorMessage("reload");
+
+		jQuery(".responsive-toggler").click(function() {
+			errorMessage("toggle");
+		})
+	});
+	var resizeTimer;
+	jQuery(window).resize(function() {
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(function() {
+			errorMessage("resize");
+		}, 250);
+	});
+	function errorMessage(test) {
+		var height = jQuery("#errorHandling\\:notiBar").children().first()
+				.outerHeight();
+		var tempheight = height + 60;
+		var paddingTop = 0;
+		if (jQuery(window).outerWidth() <= 974) {
+			if (test === "toggle" && !jQuery(".page-sidebar").hasClass("in")) {
+				paddingTop = 1;
+			}
+			if (test !== "toggle" && jQuery(".page-sidebar").hasClass("in")) {
+				paddingTop = 1;
+			}
+		}
+		jQuery(".page-sidebar-wrapper").css(
+				"cssText",
+				"margin-top:" + tempheight + "px !important; padding-top:"
+						+ paddingTop + "px !important;");
+		jQuery(".navbar-fixed-top").css("top", height);
+		jQuery(".errorPanel").css("height", height);
+	}
+	//]]>
+</script>
+
+</head>
+
+<body id="body"><!--   -->
+	<div class="page-header navbar navbar-fixed-top" ng-controller="HeaderCtrl">
+		<!-- BEGIN HEADER INNER -->
+		<div class="page-header-inner">
+			<!-- BEGIN LOGO -->
+			<div class="page-logo">
+				<a href="http://www.admb.be/nl/provikmo" id="logo"><img
+					src="https://dev-static.admb.be/admb-faces-template/v2/images/logo/logo-provikmo-nl.png"/>
+				</a>
+				<div class="menu-toggler sidebar-toggler">
+					<!--  hide -->
+					<!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+				</div>
+				<!-- BEGIN RESPONSIVE MENU TOGGLER -->
+				<a href="javascript:;" class="menu-toggler responsive-toggler"
+					data-toggle="collapse" data-target=".navbar-collapse" />
+				<!-- END RESPONSIVE MENU TOGGLER -->
+			</div>
+			<!-- END LOGO -->
+			<div
+				style="float: left; height: 60px; padding-top: 22px; font-weight: bold; margin-left: 20px;">
+			</div>
+			<!-- BEGIN TOP NAVIGATION MENU -->
+			<div class="top-menu">
+				<ul class="nav navbar-nav pull-right">
+					<li class="username">{{currentUser.firstname}} {{currentUser.lastname}}</li><!--  -->
+					<li class="resize"><a><i class="icon-size-fullscreen"></i></a>
+					</li>
+
+				</ul>
+			</div>
+			<!-- END TOP NAVIGATION MENU -->
+		</div>
+		<!-- END HEADER INNER -->
+	</div>
+	<!-- BEGIN HEADER -->
+
+	<div class="page-sidebar-wrapper" ng-controller="SidebarCtrl">
+		<div class="page-sidebar navbar-collapse collapse">
+			<ul class="page-sidebar-menu" data-auto-scroll="true"
+				data-slide-speed="200">
+				<li ng-repeat="parrent in menuItems"><a
+					href="parrent.externalLocationLink" ng-show="!parrent.children">
+						<i class="{{parrent.iconLocation}}"></i> 
+						<span class="title" translated="{{parrent.messageKey}}"></span>
+				</a> <a href="#" ng-show="parrent.children"> <i
+						class="{{parrent.iconLocation}}"></i> <span class="title" translated="{{parrent.messageKey}}">
+						</span> <span class="selected" />
+				</a>
+					<ul class="sub-menu" style="" ng-show="parrent.children">
+						<li ng-repeat="children in parrent.children"><a
+							href="{{children.externalLocationLink}}" translated="{{children.messageKey}}">
+								 </a></li>
+					</ul></li>
+
+			</ul>
+		</div>
+	</div>
+	<div class="page-content-wrapper">
+		<div class="page-content">
+			<!-- BEGIN PAGE CONTENT-->
+			<div class="row">
+				<div class="col-md-12">
+					<section id="directives-calendar" ng-controller="CalendarCtrl">
+						<div>
+							<div class="smallCalendar">
+								<div style="display: inline-block;">
+									<uib-datepicker id="littleCalendar" ng-model="defaultDate" show-weeks="true"
+										class="well well-sm" starting-day="1"></uib-datepicker>
+								</div>
+								<div id="external-events"
+									style="margin-top: 15px; width: 86%; padding: 0 10px; border: 1px solid #ccc; background: #eee; text-align: left;">
+									<h4>Draggable Events</h4>
+									<div class="fc-event draggable draggable-handle"
+										data-event='{"title":"my event", "stick":"true"}'>lol</div>
+								</div>
+							</div>
+							<div class="schedule">
+								<div class="calendar" ng-model="eventSources"
+									calendar="myCalendar1" ui-calendar="uiConfig.calendar"></div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+			<!-- END PAGE CONTENT-->
+		</div>
+	</div>
+
+	<div class="backtotop">
+		<span class="fa-stack fa-lg"> <i
+			class="fa fa-circle fa-stack-2x"></i> <i
+			class="fa fa-arrow-up fa-stack-1x fa-inverse" style="color: #89a2af;"></i>
+		</span>
+	</div>
+
+	<div class="page-footer">
+		<div class="page-footer-inner"></div>
+
+	</div>
+
+	<!-- BEGIN JAVASCRIPTS -->
+	<script src="assets/global/plugins/jquery-migrate.min.js"></script>
+	<script src="assets/global/plugins/jquery-ui/jquery-ui.min.js"></script>
+	<script src="assets/global/plugins/bootstrap/js/bootstrap.min.js"></script>
+	<script
+		src="assets/global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js"></script>
+	<script
+		src="assets/global/plugins/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="assets/global/plugins/jquery.blockui.min.js"></script>
+	<script src="assets/global/plugins/jquery.cokie.min.js"></script>
+	<script
+		src="assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+	<script src="assets/global/plugins/screenfull.js"></script>
+	<script src="assets/global/scripts/provikmo-portal.js"></script>
+	<script src="assets/layout/scripts/layout.js"></script>
+	<script src="assets/global/plugins/shortcuts.js"></script>
+	<script>
+		jQuery(document).ready(function() {
+			Portal.init();
+			Layout.init();
+		});
+	</script>
+</body>
+</html>

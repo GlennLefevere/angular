@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:security="http://www.springframework.org/schema/security" 
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+           				   http://www.springframework.org/schema/security
+           				   http://www.springframework.org/schema/security/spring-security-3.2.xsd"
+       default-lazy-init="true">
+	
+	<security:http security="none" pattern="/logout-response" />
+
+	<security:http entry-point-ref="ssoEntryPoint" authentication-manager-ref="remoteAuthenticationManager">		
+		<security:intercept-url pattern="/sim/**" access="ROLE_PROVIKMO_BUDGET_SIM"/>
+		<security:intercept-url pattern="/manage/**" access="ROLE_PROVIKMO_BUDGET_BEHEER"/>
+		<security:intercept-url pattern="/calc/**" access="ROLE_PROVIKMO_BUDGET_CALCULATOR"/>
+		<security:intercept-url pattern="/facturatie/**" access="ROLE_PROVIKMO_BUDGET_FACTURATIE"/>
+		<security:intercept-url pattern="/admin/**" access="ROLE_PROVIKMO_IT_ADMIN"/>
+		<security:intercept-url pattern="/listServices" access="ROLE_AUTHENTICATED" />
+		<security:intercept-url pattern="/**" access="ROLE_AUTHENTICATED"/>
+		
+		<!-- custom filters -->
+		<security:custom-filter ref="ssoAuthenticationProcessingFilter" position="FORM_LOGIN_FILTER" />
+		<security:custom-filter ref="forceLoginFilter" after="EXCEPTION_TRANSLATION_FILTER" />
+		<security:custom-filter ref="ssoUserTimeoutFilter" before="FORM_LOGIN_FILTER" />
+		
+		<security:logout logout-url="/logout-request" logout-success-url="/logout-response"/>
+	</security:http>
+
+	<bean id="ssoEntryPoint" class="be.admb.security.web.authentication.SSOAuthenticationProcessingFilterEntryPoint">
+		<property name="loginFormUrl" value="${sso.login.form.url}" />
+	</bean>
+
+	<bean id="forceLoginFilter" class="be.admb.security.filter.ForceLoginFilter" />
+
+	<bean id="ssoUserTimeoutFilter"
+		class="be.admb.security.filter.SSOUserTimeoutFilter">
+		<property name="filterRules">
+			<list>
+				<bean class="be.admb.security.filter.rule.impl.UrlAjaxIgnoreRule" />
+				<bean class="be.admb.security.filter.rule.impl.JSFAjaxIgnoreRule" />
+				<bean class="be.admb.security.filter.rule.impl.GetMethodOnlyRule" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ssoAuthenticationProcessingFilter"
+		class="be.provikmo.core.commons.security.web.authentication.SSOAuthenticationProcessingFilter" lazy-init="true">
+		<property name="remoteAuthenticationManager" ref="remoteAuthenticationManager" />
+	</bean>
+	
+</beans>

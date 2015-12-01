@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:hz="http://www.hazelcast.com/schema/spring"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    					   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    					   http://www.springframework.org/schema/context 
+           				   http://www.springframework.org/schema/context/spring-context-4.0.xsd
+           				   http://www.springframework.org/schema/util
+    					   http://www.springframework.org/schema/util/spring-util-4.0.xsd
+    					   http://www.springframework.org/schema/task 
+    					   http://www.springframework.org/schema/task/spring-task-4.0.xsd
+           				   http://www.hazelcast.com/schema/spring
+                		   http://www.hazelcast.com/schema/spring/hazelcast-spring-3.2.xsd">
+	<!-- Cache - Hazelcast Server configuration -->
+	<hz:hazelcast id="instance">
+		<hz:config>
+			<hz:group name="deployment" password="pwd" />
+			<hz:network port="5701" port-auto-increment="true">
+				<hz:join>
+					<hz:multicast enabled="false" />
+					<hz:tcp-ip enabled="true">
+						<hz:interface>127.0.0.1</hz:interface>
+					</hz:tcp-ip>
+				</hz:join>
+			</hz:network>
+<!-- 			<hz:map name="deploymentMap" backup-count="1" -->
+<!-- 				time-to-live-seconds="0" eviction-policy="NONE" /> -->
+		</hz:config>
+	</hz:hazelcast>
+	
+	<!-- Hazelcast client -->
+	<hz:client id="hazelCastClientProxy" depends-on="instance">
+		<hz:group name="deployment" password="pwd" />
+		<hz:network connection-attempt-limit="3"
+			connection-attempt-period="3000" connection-timeout="1000"
+			redo-operation="true" smart-routing="true">
+			<hz:member>127.0.0.1</hz:member>
+		</hz:network>
+	</hz:client>
+	
+	<!-- User -->
+	<bean id="hazelcastUserRegister" class="be.admb.alm.registration.HazelcastRegister"
+		p:id="userMap" p:hazelcastClientProxy-ref="hazelCastClientProxy"
+		p:registrations-ref="userRegistrations" init-method="init"/>
+
+    <util:list id="userRegistrations"/>
+    
+    <!-- The ApplicationMetaModel -->
+	<bean id="hazelcastClientRegister" class="be.admb.alm.registration.HazelcastRegister"
+		p:id="deploymentMap" p:hazelcastClientProxy-ref="hazelCastClientProxy"
+		p:registrations-ref="registrations" init-method="init" />
+		
+	<util:list id="registrations">
+		<ref bean="libero.RB" />
+	</util:list>
+
+	<!-- The Application Entry Points -->
+	<util:list id="entrypoints">
+		<ref bean="entrypoint-home" />
+	</util:list>
+
+	<bean id="entrypoint-home" class="be.admb.alm.application.EntryPoint"
+		p:id="BUDGET_SIM_KEY" p:category="RB_KEY" p:displayName="RB_HOME_KEY"
+		p:entryPointUrl="${amm.entrypoint1.url}" p:grants-ref="grants-home" p:weight="1"/>
+
+
+	<!-- The Application Grants -->
+	<util:list id="grants-home"> 		
+		<ref bean="grant-home"/>	
+	</util:list>
+	
+	<bean id="grant-home" class="be.admb.alm.application.Grant" p:displayName="BUDGET_SIM_KEY" p:grant="PROVIKMO_BUDGET_SIM" p:type="ENTRYPOINT"/>
+
+
+	<!-- ApplicationMetaModel -->
+	<bean id="libero.RB" class="be.admb.alm.application.ApplicationMetaModel"
+		p:id="budget.RB" p:displayName="RB_KEY" p:groupID="LIBERO"
+		p:companyID="PROVIKMO" p:type="CLIENT"
+		p:entryPoints-ref="entrypoints" p:image="icon-calendar" p:weight="5"/>
+		
+		
+	<import resource="classpath:/be/provikmo/config/applicationContext-remoting.xml"/>
+	<import resource="classpath:/be/provikmo/config/applicationContext-cache.xml"/>
+	<import resource="classpath:/be/provikmo/config/applicationContext-security.xml"/>
+    
+</beans>
